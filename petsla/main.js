@@ -1,22 +1,20 @@
 
 var productApi = 'http://petsla-api.herokuapp.com/products/';
 var ElementAmount = document.querySelector('#amount-in-page');
+var saveData;
 var listCart = JSON.parse(localStorage.getItem("data")) || [];
 function converToVND(value) {
     var test1 = value.toString();
     var x = test1.replace(/\B(?=(\d{3})+(?!\d))/g, '.')
     return x;
 }
-
 function start() {
     getData(renderHTML);
     handleDisplayCart();
     // handleAmount(pages);
 }
 
-
-start();
-
+ start();
 function renderHTML(products) {
     var htmls = products.map(function (product) {
         var converted = converToVND(product.price);
@@ -52,11 +50,12 @@ function renderHTML(products) {
         handleAmount(htmls);
     }
     handleAmount(htmls);
+    return products;
 }
-
 function saveID(id){
     localStorage.setItem("id",JSON.stringify(id));
 }
+
 
 function handleAmount(pages) {
     var blockProduct = document.querySelector('.cover-container');
@@ -89,6 +88,9 @@ function getData(callback) {
             return response.json();
         })
         .then(callback)
+        .then(function(data){
+            saveData = data;
+        })
         .catch(function (err) {
             console.log(err);
         })
@@ -103,62 +105,54 @@ function handleDivision(myArr, num) {
 }
 
 
-
 function handleAddCart(id) {
-    fetch(productApi)
-        .then(function (response) {
-            return response.json();
-        })
-        .then(function (data) {
-            var productElementAdder = data.find(function(x){
-                return x.id == id;
-            })
-            var checkAdder = listCart.find(function(x){
-                return x.id == id;
-            })
-            if (checkAdder  !== undefined) {
-                handleUpdateCart(id,+1);
-            } else {
-                var converted = converToVND(productElementAdder.price);
-                var htmls = `
-                    <div class="item-cart">
-                        <div class="add-number-item">
-                            <button class="sum" onclick="handleChanged(${id},${1})">+</button>
-                            <span class="amount">1</span>
-                            <button class="remove" onclick="handleChanged(${id},${-1})">-</button>
-                        </div>
-                        <div class="describe-item">
-                            <div class="cover-img-item">
-                                <div class="img-item" style="background-image:  url(http://petsla-api.herokuapp.com${productElementAdder.images});"></div>
-                            </div>
-                            <div class="text-item">
-                                <span class="product-title">${productElementAdder.product_name}</span>
-                                <div class="cover-prices">
-                                    <span class="caculate" style="margin-right:2px ;">${productElementAdder.price}đ x </span>
-                                    <span class="amount" style="font-size:1.3rem ;">1</span>
-                                </div>
-                                <span class="sum-monney">${converted}đ</span>
-                            </div>
-                        </div>
-                        <div class="delete-product" onclick="handleDelete(${id})">
-                            <i class="bi bi-x-lg"></i>
-                        </div>
+    var data = saveData;
+    var productElementAdder = data.find(function(x){
+        return x.id == id;
+    })
+    var checkAdder = listCart.find(function(x){
+        return x.id == id;
+    })
+    if (checkAdder  !== undefined) {
+        handleUpdateCart(id,+1);
+    } else {
+        var converted = converToVND(productElementAdder.price);
+        var htmls = `
+            <div class="item-cart">
+                <div class="add-number-item">
+                    <button class="sum" onclick="handleChanged(${id},${1})">+</button>
+                    <span class="amount">1</span>
+                    <button class="remove" onclick="handleChanged(${id},${-1})">-</button>
+                </div>
+                <div class="describe-item">
+                    <div class="cover-img-item">
+                        <div class="img-item" style="background-image:  url(http://petsla-api.herokuapp.com${productElementAdder.images});"></div>
                     </div>
-                `
-                listCart.push({
-                    id: productElementAdder.id,
-                    amount: 1,
-                    sumPrice: productElementAdder.price,
-                    images: productElementAdder.images,
-                    product_name: productElementAdder.product_name,
-                    price: productElementAdder.price,
-                    htmls: htmls
-                });
-            }
-        })
-        .then(function () {
-            handleDisplayCart();
-        })
+                    <div class="text-item">
+                        <span class="product-title">${productElementAdder.product_name}</span>
+                        <div class="cover-prices">
+                            <span class="caculate" style="margin-right:2px ;">${productElementAdder.price}đ x </span>
+                            <span class="amount" style="font-size:1.3rem ;">1</span>
+                        </div>
+                        <span class="sum-monney">${converted}đ</span>
+                    </div>
+                </div>
+                <div class="delete-product" onclick="handleDelete(${id})">
+                    <i class="bi bi-x-lg"></i>
+                </div>
+            </div>
+        `
+        listCart.push({
+            id: productElementAdder.id,
+            amount: 1,
+            sumPrice: productElementAdder.price,
+            images: productElementAdder.images,
+            product_name: productElementAdder.product_name,
+            price: productElementAdder.price,
+            htmls: htmls
+        });
+    }
+    handleDisplayCart();
     localStorage.setItem("data",JSON.stringify(listCart));    
 }
 
@@ -239,4 +233,3 @@ function handleDelete(id){
     localStorage.setItem("data",JSON.stringify(listCart));
     handleDisplayCart();
 }
-
