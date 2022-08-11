@@ -1,0 +1,34 @@
+@media  (max-width:1240px){
+    .sub-cart{
+        display: none;
+    }
+}
+@media (max-width:740px){
+    .bi-bag{
+        display: none;
+    }
+    .header_logo{
+        display: none;
+    }
+    .header_cart{
+        display: none;
+    }
+    .header_input-search{
+        flex: 1;
+    }
+    .header_contact{
+        display: none;
+    }
+    .header_logo-tablet{
+        display: block;
+    }
+    .grid{
+        padding: 0 10rem;
+    }
+    .header-nav{
+        display: none;
+    }
+    .button-nav{
+        display: block;
+    }
+}
